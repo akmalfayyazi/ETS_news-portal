@@ -20,7 +20,6 @@ const IMGS = {
   Olahraga:  [
     'https://images.unsplash.com/photo-1570498839593-e565b39455fc?w=800&q=80',
     'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80',
-    'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800',
   ],
   Ekonomi:   [
     'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
@@ -30,7 +29,6 @@ const IMGS = {
   Hiburan:   [
     'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80',
     'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=800&q=80',
-    'https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?w=800',
   ],
 };
 
