@@ -1,545 +1,554 @@
-/* ════════════════════════════════════════════════════
-   KabarKini — script.js
-   Data, rendering, filtering, dark mode, search, detail
-════════════════════════════════════════════════════ */
+// ========================================
+// KabarKini - script.js
+// ========================================
 
-'use strict';
-
-/* ─── Unsplash deterministic images per category ─── */
-const IMGS = {
-  Politik:   [
-    'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80',
-    'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800&q=80',
-    'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=800&q=80',
-  ],
-  Teknologi: [
-    'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',
-    'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&q=80',
-    'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80',
-  ],
-  Olahraga:  [
-    'https://images.unsplash.com/photo-1570498839593-e565b39455fc?w=800&q=80',
-    'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80',
-    'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800',
-  ],
-  Ekonomi:   [
-    'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
-    'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=800&q=80',
-    'https://images.unsplash.com/photo-1543286386-713bdd548da4?w=800&q=80',
-  ],
-  Hiburan:   [
-    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80',
-    'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=800&q=80',
-    // 'https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?w=800',
-  ],
-};
-
-const BADGE_ICONS = {
-  Politik:   'bi-building-fill',
-  Teknologi: 'bi-cpu-fill',
-  Olahraga:  'bi-trophy-fill',
-  Ekonomi:   'bi-graph-up-arrow',
-  Hiburan:   'bi-stars',
-};
-
-/* ─── Dummy News Data ─── */
-const NEWS = [
-  /* ── Politik ── */
+// Data berita dummy
+var berita = [
+  // ── Politik ──
   {
-    id: 1, kategori: 'Politik', trending: true, headline: true,
-    judul: 'Sidang Paripurna DPR Sahkan RUU Pemilu dengan Suara Bulat',
-    ringkasan: 'Seluruh fraksi di DPR RI akhirnya menyetujui Rancangan Undang-Undang Pemilu yang telah dibahas selama lebih dari setahun. Regulasi baru ini mencakup penerapan sistem proporsional terbuka dan pembatasan dana kampanye.',
+    id: 1,
+    kategori: 'Politik',
+    headline: true,
+    trending: true,
+    judul: 'DPR Sahkan RUU Pemilu dengan Suara Bulat di Sidang Paripurna',
+    ringkasan: 'Seluruh fraksi di DPR RI menyetujui RUU Pemilu yang mencakup sistem proporsional terbuka dan pembatasan dana kampanye setelah pembahasan lebih dari satu tahun.',
     isi: [
       'Dewan Perwakilan Rakyat Republik Indonesia menggelar sidang paripurna untuk mengesahkan Rancangan Undang-Undang Pemilu. Sidang yang berlangsung mulai pukul 09.00 WIB ini dihadiri oleh 480 anggota DPR dari seluruh fraksi.',
       'Ketua DPR dalam sambutannya menyatakan bahwa undang-undang ini merupakan tonggak penting dalam perjalanan demokrasi Indonesia. Regulasi baru ini akan berlaku mulai tahun 2026 dan mengatur seluruh mekanisme pemilihan umum dari tingkat desa hingga nasional.',
-      'Salah satu poin paling kontroversial yang akhirnya disepakati adalah penerapan sistem proporsional terbuka yang memberikan kesempatan lebih besar kepada kandidat perempuan. Minimal 30 persen calon dalam setiap daftar partai harus berjenis kelamin perempuan.',
-      'Pembatasan dana kampanye juga diperketat secara signifikan. Calon legislatif kini hanya diperbolehkan menghabiskan maksimal Rp 2 miliar untuk kampanye di tingkat kabupaten/kota. Pelanggaran terhadap ketentuan ini dapat mengakibatkan diskualifikasi.',
-      'Para pengamat politik menyambut positif pengesahan UU ini, meskipun beberapa pihak masih mempertanyakan efektivitas pengawasan oleh Bawaslu dalam menghadapi era digital yang semakin kompleks.',
+      'Proses pengesahan ini diwarnai dengan perdebatan panjang yang telah memakan waktu lebih dari satu tahun di tingkat panitia kerja (Panja). Berbagai kelompok masyarakat sipil sebelumnya sempat menggelar aksi damai di depan Gedung Parlemen untuk mengawal poin-poin krusial dalam RUU ini.',
+      'Salah satu poin yang disepakati adalah penerapan sistem proporsional terbuka yang memberikan kesempatan lebih besar kepada kandidat perempuan. Minimal 30 persen calon dalam setiap daftar partai harus berjenis kelamin perempuan, dan penempatannya di surat suara harus berselang-seling atau menggunakan sistem "zipper".',
+      'Pembatasan dana kampanye juga diperketat. Calon legislatif kini hanya diperbolehkan menghabiskan maksimal Rp 2 miliar untuk kampanye di tingkat kabupaten/kota, Rp 5 miliar untuk tingkat provinsi, dan Rp 10 miliar untuk tingkat pusat. Angka ini dinilai rasional untuk menekan praktik politik uang.',
+      'Badan Pengawas Pemilu (Bawaslu) dan Pusat Pelaporan dan Analisis Transaksi Keuangan (PPATK) akan diberikan kewenangan ekstra untuk mengaudit rekening khusus dana kampanye secara real-time. Pelanggaran administratif terkait pelaporan dana ini dapat mengakibatkan diskualifikasi langsung sebelum hari pemungutan suara.',
+      'Selain itu, RUU ini juga mengamanatkan penggunaan teknologi rekapitulasi suara digital yang lebih terintegrasi untuk mencegah manipulasi data di tingkat kecamatan. Sistem baru ini akan memangkas waktu penghitungan suara nasional dari yang sebelumnya memakan waktu 35 hari menjadi maksimal 14 hari kerja.',
+      'Sejumlah pengamat politik menyambut baik pengesahan ini. "Ini adalah langkah berani dari DPR. Transparansi dana kampanye adalah kunci untuk menghasilkan wakil rakyat yang berintegritas," ujar Dr. Hendra Setiawan, pengamat politik dari Universitas Indonesia.'
     ],
-    penulis: 'Budi Santoso', waktu: '2 jam lalu', views: '45.2K',
-    tags: ['DPR', 'Pemilu', 'Politik', 'Demokrasi'],
+    penulis: 'Budi Santoso',
+    waktu: '2 jam lalu',
+    views: '45.2K',
+    gambar: 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80',
+    tags: ['DPR', 'Pemilu', 'Politik']
   },
   {
-    id: 2, kategori: 'Politik', trending: false, headline: false,
-    judul: 'Presiden Lantik Kabinet Baru, 12 Menteri Wajah Segar',
-    ringkasan: 'Dalam upacara di Istana Negara, Presiden melantik 12 menteri baru hasil evaluasi kinerja semester pertama. Perubahan ini mencakup sejumlah kementerian strategis termasuk keuangan dan industri.',
+    id: 2,
+    kategori: 'Politik',
+    headline: false,
+    trending: false,
+    judul: 'Presiden Lantik 12 Menteri Baru dalam Reshuffle Kabinet',
+    ringkasan: 'Dalam upacara di Istana Negara, Presiden melantik 12 menteri baru hasil evaluasi kinerja semester pertama yang mencakup sejumlah kementerian strategis.',
     isi: [
-      'Presiden RI secara resmi melantik 12 menteri baru dalam upacara yang berlangsung khidmat di Istana Negara. Reshuffle kabinet ini merupakan yang pertama sejak terbentuknya pemerintahan baru 18 bulan lalu.',
-      'Perubahan paling signifikan terjadi di kementerian yang menangani sektor ekonomi. Menteri Keuangan yang baru, seorang ekonom senior berusia 52 tahun, diharapkan dapat membawa stabilitas di tengah volatilitas pasar global.',
-      'Presiden menjelaskan bahwa pergantian ini didasarkan pada evaluasi kinerja yang komprehensif dan kebutuhan akselerasi program prioritas nasional. Menteri-menteri yang diganti tetap mendapat penghargaan atas kontribusi mereka.',
+      'Presiden RI secara resmi melantik 12 menteri baru dalam upacara di Istana Negara. Reshuffle kabinet ini merupakan yang pertama sejak terbentuknya pemerintahan baru 18 bulan lalu.',
+      'Perubahan paling signifikan terjadi di kementerian yang menangani sektor ekonomi. Menteri Keuangan yang baru diharapkan dapat membawa stabilitas di tengah volatilitas pasar global dan tekanan inflasi yang mulai dirasakan di kuartal terakhir.',
+      'Presiden menjelaskan bahwa pergantian ini didasarkan pada evaluasi kinerja yang komprehensif dan kebutuhan akselerasi program prioritas nasional. "Kita butuh pelari cepat. Tantangan ekonomi global 2026 tidak bisa dihadapi dengan cara-cara biasa," tegas Presiden dalam pidato singkatnya pasca pelantikan.',
+      'Kementerian Perdagangan dan Kementerian Perindustrian juga mendapatkan pimpinan baru yang berasal dari kalangan profesional dan teknokrat, bukan dari partai politik. Hal ini menuai pujian dari pelaku pasar yang melihatnya sebagai sinyal positif untuk perbaikan iklim investasi.',
+      'Selain sektor ekonomi, perombakan juga menyentuh sektor pendidikan dan kebudayaan. Menteri yang baru dilantik berjanji akan segera menyelesaikan persoalan kesejahteraan guru honorer yang sempat memicu gelombang protes di berbagai daerah pada bulan lalu.',
+      'Acara pelantikan yang berlangsung khidmat ini juga dihadiri oleh Wakil Presiden, pimpinan lembaga negara, serta sejumlah ketua umum partai politik koalisi pemerintahan. Kehadiran para elite politik ini seakan menepis rumor adanya keretakan dalam koalisi akibat reshuffle.',
+      'Di akhir acara, para menteri baru langsung dijadwalkan mengikuti rapat kabinet paripurna perdana pada sore harinya untuk menerima arahan langsung terkait target 100 hari kerja pertama mereka.',
+      'Indeks Harga Saham Gabungan (IHSG) dilaporkan langsung ditutup menguat 1,5 persen pasca pengumuman susunan kabinet baru ini, menunjukkan optimisme pasar terhadap susunan tim ekonomi yang baru.'
     ],
-    penulis: 'Siti Rahayu', waktu: '4 jam lalu', views: '32.1K',
-    tags: ['Kabinet', 'Presiden', 'Pemerintahan'],
+    penulis: 'Siti Rahayu',
+    waktu: '4 jam lalu',
+    views: '32.1K',
+    gambar: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800&q=80',
+    tags: ['Kabinet', 'Presiden']
   },
   {
-    id: 3, kategori: 'Politik', trending: false, headline: false,
-    judul: 'KPK Tetapkan Gubernur X sebagai Tersangka Korupsi Dana Infrastruktur',
-    ringkasan: 'Komisi Pemberantasan Korupsi menetapkan seorang gubernur aktif sebagai tersangka dalam kasus korupsi pengadaan infrastruktur senilai Rp 450 miliar. Pemeriksaan dijadwalkan pada pekan depan.',
+    id: 3,
+    kategori: 'Politik',
+    headline: false,
+    trending: false,
+    judul: 'KPK Tetapkan Gubernur Aktif sebagai Tersangka Korupsi',
+    ringkasan: 'Komisi Pemberantasan Korupsi menetapkan seorang gubernur aktif sebagai tersangka kasus korupsi pengadaan infrastruktur senilai Rp 450 miliar.',
     isi: [
-      'Komisi Pemberantasan Korupsi (KPK) secara mengejutkan mengumumkan penetapan seorang gubernur aktif sebagai tersangka kasus korupsi. Kasus ini bermula dari laporan masyarakat mengenai proyek infrastruktur yang dinilai tidak wajar.',
-      'Berdasarkan hasil penyelidikan selama delapan bulan, KPK menemukan indikasi kuat adanya penyimpangan dalam proses pengadaan proyek senilai Rp 450 miliar. Dana tersebut seharusnya digunakan untuk pembangunan jalan dan jembatan di wilayah terpencil.',
-      'Gubernur yang bersangkutan melalui kuasa hukumnya menyatakan akan kooperatif dan mengikuti seluruh proses hukum yang berlaku. Tim penasihat hukumnya berjanji akan membuktikan bahwa klien mereka tidak bersalah.',
+      'KPK mengumumkan penetapan seorang gubernur aktif di wilayah Sumatera sebagai tersangka kasus korupsi. Kasus ini bermula dari laporan masyarakat mengenai proyek infrastruktur yang dinilai tidak wajar dan mangkrak selama dua tahun terakhir.',
+      'Berdasarkan penyelidikan intensif selama delapan bulan, KPK menemukan indikasi penyimpangan dalam proses pengadaan proyek senilai Rp 450 miliar untuk pembangunan jalan lintas provinsi dan jembatan penghubung.',
+      'Juru Bicara KPK dalam konferensi pers di Gedung Merah Putih memaparkan adanya bukti transfer aliran dana ke sejumlah rekening fiktif yang dikendalikan oleh orang dekat sang gubernur. "Kami menemukan mark-up material hingga 40 persen dari harga pasar," ungkapnya.',
+      'Selain menetapkan gubernur tersebut sebagai tersangka, KPK juga menahan tiga orang lainnya yang terdiri dari Kepala Dinas Pekerjaan Umum setempat dan dua direktur perusahaan swasta pemenang tender.',
+      'Operasi penggeledahan yang dilakukan tim penyidik di rumah dinas gubernur dan beberapa kantor dinas berhasil mengamankan barang bukti berupa uang tunai senilai Rp 15 miliar dalam pecahan rupiah dan dolar Singapura, serta sejumlah dokumen proyek.',
+      'KPK juga telah memblokir lebih dari 20 rekening bank yang terafiliasi dengan para tersangka serta menyita lima kendaraan mewah yang diduga kuat merupakan hasil tindak pidana pencucian uang (TPPU).',
+      'Gubernur melalui kuasa hukumnya, yang ditemui wartawan di luar gedung KPK, menyatakan akan kooperatif dan mengikuti seluruh proses hukum yang berlaku. Pihaknya mengklaim bahwa kliennya tidak mengetahui adanya permainan kotor di tingkat bawah.',
+      'Menteri Dalam Negeri langsung merespons penahanan ini dengan menunjuk Wakil Gubernur sebagai Pelaksana Tugas (Plt) agar roda pemerintahan dan pelayanan publik di provinsi tersebut tidak terganggu.'
     ],
-    penulis: 'Ahmad Fauzi', waktu: '6 jam lalu', views: '78.5K',
-    tags: ['KPK', 'Korupsi', 'Hukum', 'Daerah'],
+    penulis: 'Ahmad Fauzi',
+    waktu: '6 jam lalu',
+    views: '78.5K',
+    gambar: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=800&q=80',
+    tags: ['KPK', 'Korupsi', 'Hukum']
   },
 
-  /* ── Teknologi ── */
+  // ── Teknologi ──
   {
-    id: 4, kategori: 'Teknologi', trending: true, headline: false,
+    id: 4,
+    kategori: 'Teknologi',
+    headline: false,
+    trending: true,
     judul: 'Startup AI Lokal Raih Pendanaan Seri B Senilai Rp 850 Miliar',
-    ringkasan: 'Perusahaan rintisan kecerdasan buatan asal Bandung berhasil menutup putaran pendanaan Seri B dengan total investasi yang mengesankan. Dana ini akan digunakan untuk ekspansi ke 5 negara ASEAN.',
+    ringkasan: 'Perusahaan rintisan kecerdasan buatan asal Bandung berhasil menutup putaran pendanaan dengan total investasi yang akan digunakan untuk ekspansi ke 5 negara ASEAN.',
     isi: [
-      'Sebuah startup kecerdasan buatan (AI) asal Bandung berhasil mengamankan pendanaan Seri B senilai Rp 850 miliar dari konsorsium investor yang terdiri dari beberapa venture capital ternama dari Singapura, Amerika Serikat, dan Jepang.',
-      'Perusahaan yang berdiri pada 2021 ini mengembangkan solusi AI khusus untuk industri pertanian dan ketahanan pangan. Platform mereka telah digunakan oleh lebih dari 50.000 petani di Pulau Jawa dan Sumatera untuk meningkatkan hasil panen.',
-      'CEO dan co-founder perusahaan menyatakan bahwa pendanaan ini akan digunakan untuk memperluas tim riset dan pengembangan, serta melakukan ekspansi ke lima negara ASEAN dalam 18 bulan ke depan. Filipina dan Vietnam menjadi target prioritas pertama.',
-      'Model AI mereka diklaim mampu memprediksi kondisi cuaca mikro, serangan hama, dan waktu optimal panen dengan akurasi hingga 94 persen. Teknologi ini telah membantu meningkatkan pendapatan petani rata-rata sebesar 35 persen.',
+      'Sebuah startup kecerdasan buatan (AI) bernama "TaniTech" asal Bandung berhasil mengamankan pendanaan Seri B senilai Rp 850 miliar. Suntikan dana ini dipimpin oleh konsorsium investor raksasa dari Singapura, Amerika Serikat, dan Jepang.',
+      'Perusahaan yang berdiri pada pertengahan 2021 ini fokus mengembangkan solusi AI prediktif untuk industri pertanian berkelanjutan. Platform mereka sejauh ini telah digunakan oleh lebih dari 50.000 petani di seluruh Jawa dan Sumatera.',
+      'Teknologi yang ditawarkan TaniTech mengombinasikan sensor tanah (IoT), pencitraan drone, dan algoritma *machine learning* untuk memberikan rekomendasi pemupukan dan irigasi yang sangat presisi kepada petani melalui aplikasi ponsel pintar.',
+      'Dana segar ini akan digunakan untuk memperluas tim riset, khususnya merekrut talenta *data scientist* lokal, dan melakukan ekspansi agresif ke lima negara ASEAN—termasuk Vietnam dan Thailand—dalam 18 bulan ke depan.',
+      'CEO dan *Co-Founder* TaniTech, Raka Andika, menyatakan, "Model AI kami diklaim mampu memprediksi kondisi cuaca mikro dan potensi serangan hama spesifik dengan akurasi 94 persen. Ini tidak hanya menyelamatkan gagal panen, tetapi juga menekan biaya operasional petani hingga 30 persen."',
+      'Salah satu perwakilan investor dari Jepang menyebutkan bahwa mereka sangat tertarik dengan TaniTech karena solusi yang ditawarkan sangat adaptif terhadap kondisi iklim tropis yang seringkali tidak terprediksi, berbeda dengan AI pertanian buatan Barat.',
+      'Ke depan, TaniTech berencana untuk mengintegrasikan layanan pembiayaan mikro di dalam aplikasinya, bekerja sama dengan bank BUMN, guna memberikan akses modal langsung kepada petani kecil berdasarkan skor kredit dari data panen yang diolah AI.',
+      'Pencapaian TaniTech ini menambah panjang daftar startup *deep-tech* Indonesia yang berhasil membuktikan bahwa inovasi anak bangsa mampu menarik perhatian dan modal di kancah global.'
     ],
-    penulis: 'Dewi Lestari', waktu: '1 jam lalu', views: '28.7K',
-    tags: ['Startup', 'AI', 'Investasi', 'Pertanian'],
+    penulis: 'Dewi Lestari',
+    waktu: '1 jam lalu',
+    views: '28.7K',
+    gambar: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',
+    tags: ['Startup', 'AI', 'Investasi']
   },
   {
-    id: 5, kategori: 'Teknologi', trending: true, headline: false,
-    judul: 'Pemerintah Resmi Luncurkan Program 5G Nasional di 50 Kota',
-    ringkasan: 'Kementerian Komunikasi dan Informatika meluncurkan rollout 5G secara masif yang akan menjangkau 50 kota besar di seluruh Indonesia dalam dua tahun ke depan, membawa revolusi konektivitas digital.',
+    id: 5,
+    kategori: 'Teknologi',
+    headline: false,
+    trending: true,
+    judul: 'Pemerintah Luncurkan Program 5G Nasional di 50 Kota Besar',
+    ringkasan: 'Kementerian Kominfo meluncurkan rollout 5G yang akan menjangkau 50 kota besar di seluruh Indonesia dalam dua tahun ke depan.',
     isi: [
-      'Kementerian Komunikasi dan Informatika secara resmi meluncurkan program perluasan jaringan 5G Nasional yang ambisius. Program ini menargetkan 50 kota di Indonesia mendapatkan akses 5G komersial dalam dua tahun mendatang.',
-      'Dalam tahap pertama yang dimulai bulan ini, sebanyak 15 kota prioritas termasuk Jakarta, Surabaya, Medan, Makassar, dan Bali akan mendapatkan peningkatan infrastruktur jaringan. Tiga operator telekomunikasi besar telah menandatangani komitmen investasi senilai total Rp 45 triliun.',
-      'Menteri Kominfo menjelaskan bahwa 5G bukan sekadar internet lebih cepat, melainkan fondasi untuk transformasi industri melalui IoT, smart city, telemedicine, dan kendaraan otonom. Kecepatan unduh yang ditawarkan bisa mencapai 10 Gbps.',
+      'Kementerian Komunikasi dan Informatika (Kominfo) resmi meluncurkan program perluasan jaringan 5G Nasional secara masif. Program ambisius ini menargetkan 50 kota mendapatkan akses 5G komersial dengan spektrum penuh dalam dua tahun mendatang.',
+      'Pada tahap pertama yang dimulai bulan depan, 15 kota prioritas termasuk Jakarta, Surabaya, Medan, Makassar, dan Denpasar akan mendapatkan peningkatan infrastruktur pemancar. Tiga operator telekomunikasi besar telah menandatangani komitmen investasi dengan total nilai Rp 45 triliun.',
+      'Menteri Kominfo dalam peresmiannya menjelaskan bahwa 5G bukan sekadar internet cepat untuk ponsel pintar, melainkan fondasi vital untuk transformasi industri digital. Jaringan ini akan mendukung *Internet of Things* (IoT), *smart city*, dan *telemedicine* dengan latensi sangat rendah.',
+      'Infrastruktur 5G ini akan memanfaatkan pita frekuensi menengah di 3.5 GHz dan pita milimeter-wave di 26 GHz yang baru saja dilelang oleh pemerintah. Kecepatan unduh di area padat diproyeksikan bisa mencapai 10 Gbps secara stabil.',
+      'Di sektor industri, penerapan 5G ini diharapkan memacu efisiensi. Beberapa perusahaan tambang di Kalimantan dan pelabuhan di Surabaya dikabarkan telah menyiapkan cetak biru untuk menerapkan alat berat otonom (*autonomous vehicles*) yang dikendalikan dari jarak jauh via 5G.',
+      'Pemerintah juga menegaskan komitmennya untuk memastikan keamanan siber pada infrastruktur tulang punggung 5G ini. Kominfo bekerja sama dengan Badan Siber dan Sandi Negara (BSSN) telah menetapkan standar keamanan perangkat telekomunikasi yang ketat.',
+      'Meskipun fokus awal berada di kota besar dan area industri, Kominfo berjanji skema subsidi silang akan diterapkan agar percepatan infrastruktur ini nantinya dapat merata hingga ke daerah 3T (Tertinggal, Terdepan, dan Terluar).',
+      'Peluncuran ini disambut antusias oleh para pelaku *e-sports* dan *content creator* tanah air yang selama ini kerap terhambat oleh masalah stabilitas jaringan saat melakukan *live streaming* resolusi tinggi.'
     ],
-    penulis: 'Rizki Pratama', waktu: '3 jam lalu', views: '41.3K',
-    tags: ['5G', 'Teknologi', 'Digital', 'Kominfo'],
+    penulis: 'Rizki Pratama',
+    waktu: '3 jam lalu',
+    views: '41.3K',
+    gambar: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&q=80',
+    tags: ['5G', 'Teknologi', 'Kominfo']
   },
   {
-    id: 6, kategori: 'Teknologi', trending: false, headline: false,
-    judul: 'Chip Buatan Anak Bangsa Siap Bersaing di Pasar Global',
-    ringkasan: 'Tim riset dari Institut Teknologi Bandung berhasil mengembangkan prosesor RISC-V pertama buatan Indonesia yang diklaim mampu menyaingi efisiensi energi chip ARM generasi terbaru.',
+    id: 6,
+    kategori: 'Teknologi',
+    headline: false,
+    trending: false,
+    judul: 'Chip Prosesor Buatan ITB Siap Bersaing di Pasar Global',
+    ringkasan: 'Tim riset dari Institut Teknologi Bandung berhasil mengembangkan prosesor RISC-V pertama buatan Indonesia yang diklaim hemat energi dan mampu menjalankan Linux.',
     isi: [
-      'Sebuah terobosan besar hadir dari dunia riset Indonesia. Tim peneliti dari Institut Teknologi Bandung (ITB) berhasil menyelesaikan pengembangan prosesor berbasis arsitektur RISC-V yang sepenuhnya dirancang oleh putra-putri bangsa.',
-      'Chip bernama "Nusantara-1" ini dirancang menggunakan proses fabrikasi 7nm dan diklaim memiliki efisiensi energi yang setara dengan chip ARM generasi terkini. Prototipe telah berhasil menjalankan sistem operasi Linux secara stabil.',
-      'Proyek yang memakan waktu empat tahun ini mendapat dukungan penuh dari Badan Riset dan Inovasi Nasional (BRIN) serta beberapa perusahaan teknologi swasta. Tahap komersialisasi direncanakan dimulai pada pertengahan tahun depan.',
+      'Tim peneliti dari Institut Teknologi Bandung (ITB) menorehkan sejarah baru dengan berhasil menyelesaikan pengembangan prosesor silikon berbasis arsitektur *open-source* RISC-V yang sepenuhnya dirancang oleh putra-putri bangsa.',
+      'Chip yang diberi nama "Nusantara-1" ini menggunakan proses fabrikasi 7 nanometer, sebuah pencapaian luar biasa untuk fasilitas riset di Indonesia. Chip ini diklaim memiliki efisiensi energi yang setara bahkan sedikit melampaui beberapa varian chip ARM generasi terkini.',
+      'Dalam demonstrasi tertutup minggu lalu, prototipe "Nusantara-1" telah berhasil menjalankan sistem operasi distribusi Linux secara mulus, memproses rendering video, dan menjalankan komputasi server dasar tanpa mengalami *overheating*.',
+      'Proyek *microchip* ini memakan waktu empat tahun pengerjaan dengan dukungan pendanaan penuh dari Badan Riset dan Inovasi Nasional (BRIN) senilai Rp 120 miliar, serta kolaborasi *transfer knowledge* dengan beberapa perusahaan semikonduktor multinasional.',
+      'Ketua Tim Riset ITB, Prof. Dr. Ilham Akbar, menjelaskan bahwa Nusantara-1 dirancang spesifik untuk perangkat *Internet of Things* (IoT) kelas menengah dan sistem otomasi industri. "Kami memprioritaskan keamanan perangkat keras yang bebas dari *backdoor* asing," ujarnya.',
+      'Pemerintah melihat inovasi ini sebagai langkah awal kemandirian teknologi nasional di tengah perang cip antara negara-negara adidaya. Chip ini direncanakan akan menjadi standar wajib untuk perangkat komputasi di fasilitas militer dan pemerintahan masa depan.',
+      'Komersialisasi chip ini dijadwalkan akan dimulai pertengahan tahun depan. ITB saat ini sedang dalam tahap akhir penjajakan kerja sama dengan *foundry* (pabrik semikonduktor) di Taiwan untuk produksi massal skala industri.',
+      'Beberapa vendor perangkat elektronik lokal dilaporkan telah menandatangani MoU untuk mengintegrasikan prosesor Nusantara-1 ke dalam produk *smart home* dan sistem kontrol kendaraan listrik listrik buatan dalam negeri.'
     ],
-    penulis: 'Eko Prasetyo', waktu: '8 jam lalu', views: '19.4K',
-    tags: ['Chip', 'RISC-V', 'ITB', 'Inovasi'],
+    penulis: 'Eko Prasetyo',
+    waktu: '8 jam lalu',
+    views: '19.4K',
+    gambar: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80',
+    tags: ['Chip', 'ITB', 'Inovasi']
   },
 
-  /* ── Olahraga ── */
+  // ── Olahraga ──
   {
-    id: 7, kategori: 'Olahraga', trending: true, headline: false,
-    judul: 'Timnas Indonesia Lolos ke Final Piala AFF Setelah Kalahkan Thailand',
-    ringkasan: 'Skuad Garuda mengukir sejarah dengan mengalahkan Thailand 2-1 di semifinal Piala AFF. Gol kemenangan yang dramatis hadir di menit ke-89 melalui tendangan keras sang kapten tim.',
+    id: 7,
+    kategori: 'Olahraga',
+    headline: false,
+    trending: true,
+    judul: 'Timnas Indonesia Lolos ke Final Piala AFF Usai Kalahkan Thailand',
+    ringkasan: 'Skuad Garuda mengukir sejarah dengan mengalahkan Thailand 2-1 di semifinal Piala AFF. Gol kemenangan hadir di menit ke-89 lewat tendangan sang kapten.',
     isi: [
-      'Timnas Indonesia mencatatkan momen bersejarah dalam perjalanan di Piala AFF. Skuad Garuda berhasil mengalahkan rival abadi Thailand dengan skor tipis 2-1 dalam pertandingan semifinal yang menegangkan di Stadion Gelora Bung Karno.',
-      'Pertandingan berjalan keras sejak menit pertama. Thailand unggul lebih dulu melalui serangan balik cepat di babak pertama. Namun Indonesia tidak menyerah dan berhasil menyamakan kedudukan melalui tendangan bebas langsung yang akurat.',
-      'Gol kemenangan yang akan dikenang sepanjang masa itu datang di menit ke-89. Kapten tim menerima umpan terobosan, mengontrol dengan sempurna, dan melepaskan tembakan keras yang gagal dijangkau kiper Thailand. Stadion pun meledak dalam euforia luar biasa.',
-      'Pelatih kepala menyatakan kebanggaannya kepada seluruh pemain yang telah berjuang habis-habisan. "Ini bukan hanya kemenangan tim, ini kemenangan seluruh rakyat Indonesia," ujarnya dalam konferensi pers pasca pertandingan.',
+      'Timnas Indonesia berhasil menuntaskan dahaga kemenangan dengan mengalahkan rival abadi mereka, Thailand, dengan skor tipis 2-1 dalam pertandingan semifinal leg kedua Piala AFF yang berlangsung dramatis di Stadion Utama Gelora Bung Karno.',
+      'Atmosfer stadion sangat memekakkan telinga dengan kehadiran lebih dari 75.000 suporter yang tak henti-hentinya menyanyikan yel-yel dukungan. Koreografi raksasa bergambar Garuda terbentang di tribun selatan sebelum *kick-off* dimulai.',
+      'Pertandingan berjalan alot di babak pertama. Thailand berhasil mencuri keunggulan lebih dulu pada menit ke-32 melalui serangan balik cepat yang diselesaikan dengan sontekan tajam striker andalan mereka, menembus sudut kiri gawang Indonesia.',
+      'Memasuki babak kedua, Skuad Garuda meningkatkan intensitas serangan. Hasilnya terlihat pada menit ke-65, Indonesia menyamakan kedudukan melalui tendangan bebas langsung dari luar kotak penalti yang melengkung indah melewati pagar betis pemain Thailand.',
+      'Ketegangan memuncak di sisa waktu pertandingan. Ketika laga sepertinya akan dilanjutkan ke babak perpanjangan waktu, gol kemenangan bersejarah itu akhirnya hadir di menit ke-89 dan membuat GBK bergemuruh.',
+      'Sang kapten tim, yang masuk dari *blind side*, berhasil menerima umpan terobosan akurat dari lini tengah. Tanpa ragu, ia melepaskan tembakan voli keras menggunakan kaki kanannya yang sama sekali tidak bisa dijangkau oleh kiper Thailand.',
+      'Peluit panjang dibunyikan, memicu tangis haru para pemain dan ofisial di pinggir lapangan. Kemenangan agregat 3-2 ini memastikan langkah Indonesia menuju laga puncak yang telah lama diidam-idamkan.',
+      'Pelatih kepala dalam konferensi pers pasca laga menyatakan kebanggaannya dengan mata berkaca-kaca: "Mentalitas anak-anak malam ini luar biasa. Kami sempat tertinggal, tapi mereka tidak pernah menyerah. Ini bukan hanya kemenangan tim, ini kemenangan seluruh rakyat Indonesia."'
     ],
-    penulis: 'Yoga Permana', waktu: '30 menit lalu', views: '125.6K',
-    tags: ['Timnas', 'Piala AFF', 'Sepakbola', 'Garuda'],
+    penulis: 'Yoga Permana',
+    waktu: '30 menit lalu',
+    views: '125.6K',
+    gambar: 'https://images.unsplash.com/photo-1570498839593-e565b39455fc?w=800&q=80',
+    tags: ['Timnas', 'Piala AFF', 'Sepakbola']
   },
   {
-    id: 8, kategori: 'Olahraga', trending: false, headline: false,
-    judul: 'Kevin/Marcus Sumbang Emas Kejuaraan Bulutangkis Dunia 2025',
-    ringkasan: 'Pasangan ganda putra kebanggan Indonesia berhasil meraih medali emas di BWF World Championships setelah mengalahkan pasangan Denmark dalam rubber game yang menegangkan.',
+    id: 8,
+    kategori: 'Olahraga',
+    headline: false,
+    trending: false,
+    judul: 'Kevin/Marcus Raih Emas di Kejuaraan Bulutangkis Dunia 2025',
+    ringkasan: 'Pasangan ganda putra Indonesia berhasil meraih medali emas di BWF World Championships setelah mengalahkan pasangan Denmark dalam rubber game yang ketat.',
     isi: [
-      'Kevin Sanjaya Sukamuljo dan Marcus Fernaldi Gideon kembali mengharumkan nama Indonesia di panggung bulutangkis dunia. Keduanya berhasil meraih medali emas di Kejuaraan Bulutangkis Dunia BWF yang digelar di Kopenhagen, Denmark.',
-      'Final yang berlangsung ketat tersebut akhirnya dimenangkan pasangan Indonesia dengan skor 21-18, 19-21, 21-15. Pasangan Denmark memberikan perlawanan sengit, tetapi pengalaman dan variasi pukulan Kevin/Marcus terbukti menjadi kunci kemenangan.',
-      'Medali emas ini menjadi yang keempat kalinya bagi Kevin dan Marcus di kejuaraan dunia, memperkuat posisi mereka sebagai salah satu pasangan ganda putra terbaik dalam sejarah bulutangkis dunia.',
+      'Pasangan legendaris ganda putra Indonesia, Kevin Sanjaya Sukamuljo dan Marcus Fernaldi Gideon, kembali membuktikan tajinya dengan meraih medali emas bergengsi di Kejuaraan Bulutangkis Dunia BWF 2025 yang digelar di Royal Arena, Kopenhagen, Denmark.',
+      'Partai final yang mempertemukan mereka dengan pasangan nomor dua dunia asal tuan rumah Denmark ini berlangsung sangat dramatis dan menguras energi. Riuh penonton tuan rumah tidak meruntuhkan mental pasangan yang berjuluk "The Minions" tersebut.',
+      'Pertandingan dimenangkan melalui pertarungan *rubber game* dengan skor akhir 21-18, 19-21, dan 21-15. Pada set pertama, Kevin/Marcus tampil mendominasi dengan gaya permainan cepat dan *interception* mematikan di depan net.',
+      'Memasuki set kedua, pasangan Denmark mengubah strategi dengan memperlambat tempo dan bermain lob-lob panjang yang merepotkan pertahanan Indonesia. Strategi ini berhasil memaksa pertandingan dilanjutkan ke set penentuan.',
+      'Di set ketiga, stamina Marcus sempat terlihat menurun, namun pengalaman bertahun-tahun di level elit terbukti menjadi kunci. Variasi pukulan dan *smash* keras Kevin di poin-poin kritis berhasil meruntuhkan moral lawan.',
+      'Tangis haru pecah saat pukulan *shuttlecock* terakhir dari lawan membentur net. Marcus langsung tersungkur di lapangan sementara Kevin berlari memeluk pelatih mereka di pinggir lapangan.',
+      'Ini menjadi medali emas keempat bagi Kevin dan Marcus di ajang kejuaraan dunia BWF, sebuah rekor fantastis yang memperkuat posisi mereka sebagai salah satu pasangan ganda putra terbaik sepanjang masa dalam sejarah bulutangkis.',
+      '"Kami dedikasikan kemenangan ini untuk keluarga dan masyarakat Indonesia yang selalu mendukung kami di masa sulit. Usia hanyalah angka selama kemauan untuk menang masih ada," ujar Marcus dalam wawancara penganugerahan medali.'
     ],
-    penulis: 'Putri Handayani', waktu: '5 jam lalu', views: '67.2K',
-    tags: ['Bulutangkis', 'BWF', 'Kevin Marcus', 'Emas'],
+    penulis: 'Putri Handayani',
+    waktu: '5 jam lalu',
+    views: '67.2K',
+    gambar: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80',
+    tags: ['Bulutangkis', 'BWF', 'Emas']
   },
   {
-    id: 9, kategori: 'Olahraga', trending: false, headline: false,
-    judul: 'Liga BRI Musim Baru Dimulai dengan Rekor Penonton Tertinggi',
-    ringkasan: 'Pertandingan pembuka Liga BRI musim 2025/2026 berhasil menarik 80.000 penonton ke stadion, rekor tertinggi dalam sejarah sepakbola domestik Indonesia yang mencerminkan antusiasme masyarakat.',
+    id: 9,
+    kategori: 'Olahraga',
+    headline: false,
+    trending: false,
+    judul: 'Liga BRI Musim Baru Dibuka dengan Rekor 80 Ribu Penonton',
+    ringkasan: 'Pertandingan pembuka Liga BRI musim 2025/2026 menarik 80.000 penonton ke stadion, rekor tertinggi dalam sejarah sepakbola domestik Indonesia.',
     isi: [
-      'Musim baru Liga BRI 2025/2026 resmi bergulir dengan perayaan yang meriah. Pertandingan pembuka yang mempertemukan dua klub besar Jakarta ini berhasil menarik lebih dari 80.000 penonton ke Stadion Utama Gelora Bung Karno, mencetak rekor penonton terbanyak dalam sejarah sepakbola domestik.',
-      'Antusiasme masyarakat yang luar biasa ini dinilai sebagai bukti meningkatnya kualitas dan daya tarik Liga BRI dalam beberapa musim terakhir. Operator liga mengumumkan bahwa seluruh tiket terjual habis hanya dalam waktu empat jam sejak dibuka secara online.',
-      'Musim ini diikuti oleh 18 klub dengan penambahan dua tim promosi dari Liga 2. Beberapa pemain bintang asing berkualitas tinggi juga telah bergabung, meningkatkan daya saing liga secara keseluruhan.',
+      'Musim kompetisi baru Liga BRI 2025/2026 resmi bergulir dengan gegap gempita. Pertandingan pembuka yang mempertemukan dua tim raksasa klasik Indonesia berhasil menarik lebih dari 80.000 penonton ke Stadion Utama Gelora Bung Karno Jakarta.',
+      'Angka fantastis ini tercatat sebagai rekor jumlah penonton terbanyak dalam satu pertandingan dalam sejarah era profesional sepakbola domestik Indonesia, memecahkan rekor sebelumnya yang bertahan selama satu dekade.',
+      'Antusiasme luar biasa ini dinilai oleh para pengamat sebagai bukti nyata dari meningkatnya kualitas kompetisi, transparansi wasit, dan daya tarik Liga BRI yang terus berbenah. Seluruh tiket dilaporkan ludes terjual melalui platform *online* hanya dalam kurun waktu empat jam.',
+      'Pihak kepolisian mengerahkan lebih dari 4.500 personel gabungan untuk mengamankan jalannya pertandingan. Sistem pemindaian tiket biometrik wajah di pintu masuk stadion yang baru diterapkan terbukti ampuh mencegah kebocoran tiket dan menekan keberadaan calo.',
+      'Musim ini Liga BRI diikuti oleh 18 klub peserta, termasuk dua tim kuda hitam yang baru promosi dari Liga 2 yang siap memberikan kejutan. Kompetisi juga diwarnai dengan kehadiran teknologi VAR (*Video Assistant Referee*) di seluruh stadion penyelenggara.',
+      'Geliat transfer musim ini juga menjadi faktor daya tarik tersendiri. Beberapa pemain bintang asing jebolan liga-liga Eropa dan Asia Timur yang memiliki kualitas tinggi telah resmi merumput di Indonesia, secara otomatis mengangkat nilai komersial liga.',
+      'Ketua Umum PSSI yang hadir membuka *kick-off* perdana mengapresiasi kedewasaan suporter. "Sepakbola kita sudah naik kelas. Hari ini kita buktikan bahwa stadion adalah tempat yang aman dan nyaman untuk keluarga, dengan atmosfer kelas dunia," tegasnya.',
+      'Dampak ekonomi dari laga pembuka ini juga sangat signifikan. Omzet penjualan *merchandise* resmi klub dan pedagang UMKM di sekitar kawasan senayan dilaporkan melonjak hingga 300 persen dibandingkan rata-rata pertandingan musim lalu.'
     ],
-    penulis: 'Hendra Wijaya', waktu: '7 jam lalu', views: '38.9K',
-    tags: ['Liga BRI', 'Sepakbola', 'Domestik', 'Rekor'],
-  },
-
-  /* ── Ekonomi ── */
-  {
-    id: 10, kategori: 'Ekonomi', trending: false, headline: false,
-    judul: 'BI Tahan Suku Bunga Acuan di 5,75%, Rupiah Menguat Tipis',
-    ringkasan: 'Bank Indonesia memutuskan untuk mempertahankan suku bunga acuan BI Rate di level 5,75% dalam Rapat Dewan Gubernur bulan ini. Keputusan ini disambut positif pasar dengan penguatan rupiah.',
-    isi: [
-      'Bank Indonesia (BI) memutuskan untuk mempertahankan suku bunga acuan BI Rate di level 5,75% dalam Rapat Dewan Gubernur yang berlangsung dua hari. Keputusan ini sesuai dengan ekspektasi mayoritas pelaku pasar.',
-      'Gubernur BI menjelaskan bahwa keputusan ini diambil dengan mempertimbangkan kondisi ekonomi global yang masih penuh ketidakpastian dan perlunya menjaga stabilitas nilai tukar rupiah. Inflasi yang terkendali di kisaran target memberikan ruang untuk kebijakan yang lebih akomodatif ke depan.',
-      'Merespons keputusan BI, nilai tukar rupiah menguat tipis ke level Rp 15.650 per dolar AS dari sebelumnya Rp 15.720. Indeks Harga Saham Gabungan (IHSG) juga bergerak positif menguat 0,4% di akhir sesi perdagangan.',
-    ],
-    penulis: 'Mira Agustina', waktu: '4 jam lalu', views: '22.1K',
-    tags: ['Bank Indonesia', 'Suku Bunga', 'Rupiah', 'Ekonomi'],
-  },
-  {
-    id: 11, kategori: 'Ekonomi', trending: false, headline: false,
-    judul: 'Ekspor Kelapa Sawit Indonesia Naik 18% di Kuartal Pertama 2025',
-    ringkasan: 'Data terbaru dari Badan Pusat Statistik menunjukkan kenaikan signifikan nilai ekspor kelapa sawit Indonesia pada Q1 2025, didorong oleh meningkatnya permintaan dari India dan Pakistan.',
-    isi: [
-      'Nilai ekspor kelapa sawit Indonesia mencatat pertumbuhan yang menggembirakan sebesar 18 persen pada kuartal pertama 2025 dibandingkan periode yang sama tahun lalu. Data ini dirilis oleh Badan Pusat Statistik (BPS) dalam laporan bulanan terbaru.',
-      'Peningkatan ini terutama didorong oleh lonjakan permintaan dari India dan Pakistan yang masing-masing tumbuh 32 dan 28 persen. Harga minyak sawit mentah (CPO) di pasar internasional juga berada pada level yang menguntungkan di kisaran USD 1.050 per ton.',
-      'Gabungan Pengusaha Kelapa Sawit Indonesia (GAPKI) menyambut positif data ini dan berharap tren positif dapat berlanjut sepanjang tahun, meskipun tetap mewaspadai potensi hambatan tarif dari beberapa negara importir.',
-    ],
-    penulis: 'Toni Kusuma', waktu: '9 jam lalu', views: '15.8K',
-    tags: ['Ekspor', 'Sawit', 'Ekonomi', 'BPS'],
-  },
-
-  /* ── Hiburan ── */
-  {
-    id: 12, kategori: 'Hiburan', trending: true, headline: false,
-    judul: 'Film "Nusantara" Pecahkan Rekor 5 Juta Penonton dalam 7 Hari',
-    ringkasan: 'Film kolosal produksi Indonesia "Nusantara" mencatatkan pencapaian luar biasa dengan menembus angka 5 juta penonton hanya dalam tujuh hari penayangan, menjadikannya film tercepal yang mencapai milestone tersebut.',
-    isi: [
-      'Film epik bertema sejarah nusantara berjudul "Nusantara" mencetak rekor yang mengejutkan industri perfilman Indonesia. Dalam waktu hanya tujuh hari sejak penayangan perdana, film ini berhasil meraih 5 juta penonton, rekor tercepat dalam sejarah sinema Indonesia.',
-      'Film yang diproduksi dengan anggaran Rp 200 miliar dan menghabiskan tiga tahun dalam produksi ini mengisahkan perjalanan epik pendiri kerajaan Majapahit. Visual effects yang dikerjakan oleh tim gabungan Indonesia dan Korea Selatan mendapat pujian luas dari kritikus.',
-      'Sutradara film tersebut mengungkapkan kebahagiaannya dalam sebuah konferensi pers di Jakarta. Ia berterima kasih kepada seluruh tim produksi yang telah bekerja keras, serta kepada penonton Indonesia yang sangat antusias menyambut karya anak bangsa.',
-      'Film ini kini tengah dalam negosiasi untuk distribusi di beberapa negara Asia Tenggara, Australia, dan Eropa. Sebuah platform streaming internasional juga dikabarkan sedang dalam pembicaraan untuk hak tayang eksklusif di platform mereka.',
-    ],
-    penulis: 'Nadia Kusuma', waktu: '2 jam lalu', views: '93.4K',
-    tags: ['Film', 'Bioskop', 'Rekor', 'Hiburan'],
-  },
-  {
-    id: 13, kategori: 'Hiburan', trending: false, headline: false,
-    judul: 'Musisi Indonesia Raih Nominasi Grammy Awards untuk Pertama Kalinya',
-    ringkasan: 'Seorang penyanyi-penulis lagu Indonesia yang telah mendunia berhasil mendapatkan nominasi di Grammy Awards 2026 untuk kategori Best New Artist, mengukir sejarah bagi musik Indonesia di kancah global.',
-    isi: [
-      'Dunia musik Indonesia merayakan pencapaian bersejarah. Seorang musisi muda Indonesia berhasil masuk nominasi Grammy Awards 2026 dalam kategori Best New Artist, menjadikannya artis Indonesia pertama yang meraih nominasi di ajang penghargaan musik paling bergengsi di dunia.',
-      'Album debutnya yang dirilis secara internasional berhasil meraih lebih dari 500 juta streaming di berbagai platform musik digital global. Karyanya yang memadukan elemen musik tradisional Indonesia dengan pop modern mendapat respons luar biasa dari pendengar di seluruh dunia.',
-      'Industri musik Indonesia menyambut kabar ini dengan penuh kebanggaan. Berbagai asosiasi musik dan seniman tanah air mengucapkan selamat dan berharap nominasi ini dapat menjadi pintu bagi lebih banyak musisi Indonesia untuk dikenal secara global.',
-    ],
-    penulis: 'Anisa Rahman', waktu: '11 jam lalu', views: '55.7K',
-    tags: ['Grammy', 'Musik', 'Internasional', 'Hiburan'],
-  },
+    penulis: 'Hendra Wijaya',
+    waktu: '7 jam lalu',
+    views: '38.9K',
+    gambar: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800',
+    tags: ['Liga BRI', 'Sepakbola', 'Rekor']
+  }
 ];
 
-/* ═════════════════════════════════════════════════
-   UTILITY
-═════════════════════════════════════════════════ */
-const $ = (sel, ctx = document) => ctx.querySelector(sel);
-const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+// ====================================
+// State
+// ====================================
+var currentCat = 'semua';
+var currentSearch = '';
 
-function getCatBadge(kat) {
-  const key = kat.toLowerCase();
-  const icon = BADGE_ICONS[kat] || 'bi-tag-fill';
-  return `<span class="badge-pill badge-${key}"><i class="bi ${icon}"></i> ${kat}</span>`;
-}
-
-function getImg(kat, idx = 0) {
-  const list = IMGS[kat] || IMGS.Teknologi;
-  return list[idx % list.length];
-}
-
-function showToast(msg, icon = 'bi-check-circle-fill') {
-  const wrap = $('#toastWrap');
-  const el = document.createElement('div');
-  el.className = 'toast-msg';
-  el.innerHTML = `<i class="bi ${icon}"></i> ${msg}`;
-  wrap.appendChild(el);
-  setTimeout(() => {
-    el.style.animation = 'toastOut .3s ease forwards';
-    setTimeout(() => el.remove(), 300);
-  }, 2500);
-}
-
-/* ═════════════════════════════════════════════════
-   STATE
-═════════════════════════════════════════════════ */
-let currentCat = 'semua';
-let currentSearch = '';
-
-/* ═════════════════════════════════════════════════
-   DARK MODE
-═════════════════════════════════════════════════ */
+// ====================================
+// Dark Mode
+// ====================================
 function initDarkMode() {
-  const saved = localStorage.getItem('kk-theme') || 'light';
-  document.documentElement.setAttribute('data-theme', saved);
+  var saved = localStorage.getItem('theme');
+  if (saved === 'dark') {
+    document.body.classList.add('dark-mode');
+    document.getElementById('darkIcon').className = 'bi bi-sun-fill';
+  }
 }
 
 function toggleDark() {
-  const html = document.documentElement;
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  const next = isDark ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('kk-theme', next);
-  showToast(next === 'dark' ? 'Dark mode aktif 🌙' : 'Light mode aktif ☀️');
-}
-
-/* ═════════════════════════════════════════════════
-   TICKER
-═════════════════════════════════════════════════ */
-function buildTicker() {
-  const el = $('#tickerItems');
-  const headlines = NEWS.filter(n => n.trending || n.headline).map(n => n.judul);
-  // duplicate for seamless loop
-  const items = [...headlines, ...headlines].map(t => `<span>${t}</span>`).join('');
-  el.innerHTML = items;
-}
-
-/* ═════════════════════════════════════════════════
-   HERO CARD
-═════════════════════════════════════════════════ */
-function buildHero() {
-  const article = NEWS.find(n => n.headline);
-  if (!article) return;
-  const el = $('#heroCard');
-  el.innerHTML = `
-    <img src="${getImg(article.kategori, 0)}" alt="${article.judul}" loading="lazy" />
-    <div class="hero-card-body">
-      <div class="hero-badge headline-badge"><i class="bi bi-star-fill"></i> HEADLINE UTAMA</div>
-      <div class="hero-badge" style="background:transparent;padding:0;margin-bottom:8px;">${getCatBadge(article.kategori)}</div>
-      <h1 class="hero-title">${article.judul}</h1>
-      <p class="hero-excerpt">${article.ringkasan}</p>
-      <div class="hero-meta">
-        <span><i class="bi bi-person-fill"></i>${article.penulis}</span>
-        <span><i class="bi bi-clock-fill"></i>${article.waktu}</span>
-        <span><i class="bi bi-eye-fill"></i>${article.views}</span>
-      </div>
-    </div>
-  `;
-  el.addEventListener('click', () => showDetail(article.id));
-}
-
-/* ═════════════════════════════════════════════════
-   TRENDING LIST
-═════════════════════════════════════════════════ */
-function buildTrending() {
-  const el = $('#trendingList');
-  const trendNews = NEWS.filter(n => n.trending).slice(0, 5);
-  el.innerHTML = trendNews.map((n, i) => `
-    <div class="trending-item" data-id="${n.id}">
-      <span class="trend-num">${String(i + 1).padStart(2, '0')}</span>
-      <div class="trend-info">
-        <div class="trend-title">${n.judul}</div>
-        <div class="trend-meta">
-          <i class="bi bi-eye-fill"></i> ${n.views} &nbsp;·&nbsp; ${n.waktu}
-        </div>
-      </div>
-      <div class="trend-thumb">
-        <img src="${getImg(n.kategori, i)}" alt="" loading="lazy" />
-      </div>
-    </div>
-  `).join('');
-
-  $$('.trending-item').forEach(item => {
-    item.addEventListener('click', () => showDetail(+item.dataset.id));
-  });
-}
-
-/* ═════════════════════════════════════════════════
-   NEWS GRID
-═════════════════════════════════════════════════ */
-function getFilteredNews() {
-  return NEWS.filter(n => {
-    const catMatch = currentCat === 'semua' || n.kategori === currentCat;
-    const q = currentSearch.toLowerCase().trim();
-    const searchMatch = !q || n.judul.toLowerCase().includes(q) || n.ringkasan.toLowerCase().includes(q) || n.kategori.toLowerCase().includes(q);
-    return catMatch && searchMatch;
-  });
-}
-
-function renderGrid() {
-  const grid = $('#newsGrid');
-  const noResult = $('#noResult');
-  const countEl = $('#articleCount');
-  const labelEl = $('#sectionLabel');
-  const filtered = getFilteredNews();
-
-  // Update label
-  if (currentSearch) {
-    labelEl.textContent = `Hasil Pencarian: "${currentSearch}"`;
-  } else if (currentCat !== 'semua') {
-    labelEl.textContent = `Kategori: ${currentCat}`;
+  var body = document.body;
+  var icon = document.getElementById('darkIcon');
+  if (body.classList.contains('dark-mode')) {
+    body.classList.remove('dark-mode');
+    icon.className = 'bi bi-moon-fill';
+    localStorage.setItem('theme', 'light');
   } else {
-    labelEl.textContent = 'Berita Terbaru';
+    body.classList.add('dark-mode');
+    icon.className = 'bi bi-sun-fill';
+    localStorage.setItem('theme', 'dark');
   }
-  countEl.textContent = `${filtered.length} artikel`;
+}
 
-  if (!filtered.length) {
+// ====================================
+// Badge
+// ====================================
+function getBadge(kategori) {
+  var cls = 'badge-' + kategori.toLowerCase();
+  return '<span class="badge-pill ' + cls + '">' + kategori + '</span>';
+}
+
+// ====================================
+// Gambar per kategori
+// ====================================
+function getGambar(b, idx) {
+  if (b.gambar) return b.gambar;
+  var imgs = {
+    Politik: 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80',
+    Teknologi: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',
+    Olahraga: 'https://images.unsplash.com/photo-1570498839593-e565b39455fc?w=800&q=80'
+  };
+  return imgs[b.kategori] || imgs.Teknologi;
+}
+
+// ====================================
+// Hero Card
+// ====================================
+function buildHero() {
+  var hero = null;
+  for (var i = 0; i < berita.length; i++) {
+    if (berita[i].headline) { hero = berita[i]; break; }
+  }
+  if (!hero) return;
+
+  var el = document.getElementById('heroCard');
+  el.className = 'hero-card';
+  el.innerHTML =
+    '<img src="' + hero.gambar + '" alt="' + hero.judul + '" loading="lazy">' +
+    '<div class="hero-body">' +
+      '<span class="hero-badge">' + hero.kategori + '</span>' +
+      '<h2 class="hero-title">' + hero.judul + '</h2>' +
+      '<p class="hero-excerpt">' + hero.ringkasan + '</p>' +
+      '<div class="hero-meta">' +
+        '<span><i class="bi bi-person"></i>' + hero.penulis + '</span>' +
+        '<span><i class="bi bi-clock"></i>' + hero.waktu + '</span>' +
+        '<span><i class="bi bi-eye"></i>' + hero.views + '</span>' +
+      '</div>' +
+    '</div>';
+
+  el.onclick = function() { showDetail(hero.id); };
+}
+
+// ====================================
+// Trending
+// ====================================
+function buildTrending() {
+  var list = [];
+  for (var i = 0; i < berita.length; i++) {
+    if (berita[i].trending) list.push(berita[i]);
+  }
+
+  var html = '';
+  for (var j = 0; j < list.length; j++) {
+    var n = list[j];
+    var num = String(j + 1).padStart(2, '0');
+    html +=
+      '<div class="trending-item" data-id="' + n.id + '">' +
+        '<span class="trend-num">' + num + '</span>' +
+        '<div class="trend-info">' +
+          '<div class="trend-title">' + n.judul + '</div>' +
+          '<div class="trend-meta">' +
+            '<i class="bi bi-eye"></i> ' + n.views + ' &nbsp;·&nbsp; ' + n.waktu +
+          '</div>' +
+        '</div>' +
+        '<div class="trend-thumb">' +
+          '<img src="' + n.gambar + '" alt="" loading="lazy">' +
+        '</div>' +
+      '</div>';
+  }
+
+  document.getElementById('trendingList').innerHTML = html;
+
+  var items = document.querySelectorAll('.trending-item');
+  for (var k = 0; k < items.length; k++) {
+    (function(item) {
+      item.onclick = function() {
+        showDetail(parseInt(item.getAttribute('data-id')));
+      };
+    })(items[k]);
+  }
+}
+
+// ====================================
+// Filter berita
+// ====================================
+function getFiltered() {
+  var result = [];
+  for (var i = 0; i < berita.length; i++) {
+    var n = berita[i];
+    var catOk = currentCat === 'semua' || n.kategori === currentCat;
+    var q = currentSearch.toLowerCase();
+    var searchOk = !q ||
+      n.judul.toLowerCase().indexOf(q) >= 0 ||
+      n.ringkasan.toLowerCase().indexOf(q) >= 0;
+    if (catOk && searchOk) result.push(n);
+  }
+  return result;
+}
+
+// ====================================
+// Render Grid
+// ====================================
+function renderGrid() {
+  var filtered = getFiltered();
+  var grid = document.getElementById('newsGrid');
+  var noResult = document.getElementById('noResult');
+  var label = document.getElementById('sectionLabel');
+  var count = document.getElementById('articleCount');
+
+  // Label
+  if (currentSearch) {
+    label.textContent = 'Hasil: "' + currentSearch + '"';
+  } else if (currentCat !== 'semua') {
+    label.textContent = 'Kategori: ' + currentCat;
+  } else {
+    label.textContent = 'Berita Terbaru';
+  }
+  count.textContent = filtered.length + ' artikel';
+
+  if (filtered.length === 0) {
     grid.innerHTML = '';
     noResult.style.display = 'block';
     return;
   }
   noResult.style.display = 'none';
 
-  grid.innerHTML = filtered.map((n, idx) => {
-    const imgSrc = getImg(n.kategori, idx % 3);
-    return `
-    <div class="news-card" data-id="${n.id}" style="animation-delay:${idx * .06}s">
-      <div class="card-img-wrap">
-        <img src="${imgSrc}" alt="${n.judul}" loading="lazy" />
-        <div class="card-img-overlay"></div>
-        <div class="card-badge">${getCatBadge(n.kategori)}</div>
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">${n.judul}</h3>
-        <p class="card-excerpt">${n.ringkasan}</p>
-      </div>
-      <div class="card-footer">
-        <span><i class="bi bi-clock"></i> ${n.waktu}</span>
-        <span class="card-read-btn">Baca <i class="bi bi-arrow-right"></i></span>
-      </div>
-    </div>`;
-  }).join('');
+  var html = '';
+  for (var i = 0; i < filtered.length; i++) {
+    var n = filtered[i];
+    var img = getGambar(n, i);
+    html +=
+      '<div class="col-md-6 col-lg-4">' +
+        '<div class="news-card" data-id="' + n.id + '">' +
+          '<div class="card-img">' +
+            '<img src="' + img + '" alt="' + n.judul + '" loading="lazy">' +
+            '<div class="card-badge">' + getBadge(n.kategori) + '</div>' +
+          '</div>' +
+          '<div class="card-content">' +
+            '<h3 class="card-title">' + n.judul + '</h3>' +
+            '<p class="card-excerpt">' + n.ringkasan + '</p>' +
+          '</div>' +
+          '<div class="card-footer-row">' +
+            '<span><i class="bi bi-clock"></i> ' + n.waktu + '</span>' +
+            '<span class="read-link">Baca <i class="bi bi-arrow-right"></i></span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+  grid.innerHTML = html;
 
-  $$('.news-card').forEach(card => {
-    card.addEventListener('click', () => showDetail(+card.dataset.id));
-  });
+  var cards = grid.querySelectorAll('.news-card');
+  for (var j = 0; j < cards.length; j++) {
+    (function(card) {
+      card.onclick = function() {
+        showDetail(parseInt(card.getAttribute('data-id')));
+      };
+    })(cards[j]);
+  }
 }
 
-/* ═════════════════════════════════════════════════
-   DETAIL VIEW
-═════════════════════════════════════════════════ */
+// ====================================
+// Detail
+// ====================================
 function showDetail(id) {
-  const article = NEWS.find(n => n.id === id);
+  var article = null;
+  for (var i = 0; i < berita.length; i++) {
+    if (berita[i].id === id) { article = berita[i]; break; }
+  }
   if (!article) return;
 
-  // Switch views
-  $('#homeView').style.display = 'none';
-  $('#detailView').style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('homeView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'block';
+  window.scrollTo(0, 0);
 
-  const container = $('#detailContainer');
-  const related = NEWS.filter(n => n.kategori === article.kategori && n.id !== article.id).slice(0, 3);
+  // Related
+  var related = [];
+  for (var j = 0; j < berita.length; j++) {
+    if (berita[j].kategori === article.kategori && berita[j].id !== id) {
+      related.push(berita[j]);
+      if (related.length >= 3) break;
+    }
+  }
 
-  container.innerHTML = `
-    <div class="detail-hero-img">
-      <img src="${getImg(article.kategori, 0)}" alt="${article.judul}" />
-    </div>
-    <div class="detail-badge">${getCatBadge(article.kategori)}</div>
-    <h1 class="detail-title">${article.judul}</h1>
-    <div class="detail-meta">
-      <span><i class="bi bi-person-circle"></i>${article.penulis}</span>
-      <span><i class="bi bi-clock-fill"></i>${article.waktu}</span>
-      <span><i class="bi bi-eye-fill"></i>${article.views} pembaca</span>
-    </div>
-    <div class="detail-body">
-      ${article.isi.map(p => `<p>${p}</p>`).join('')}
-    </div>
-    <div class="detail-tags">
-      ${article.tags.map(t => `<span class="tag-pill">#${t}</span>`).join('')}
-    </div>
-    ${related.length ? `
-    <div class="related-section">
-      <div class="section-divider" style="margin-top:0;">
-        <span class="divider-label">Berita Terkait</span>
-        <div class="divider-line"></div>
-      </div>
-      <div class="related-grid">
-        ${related.map((rn, ri) => `
-          <div class="news-card" data-id="${rn.id}" style="animation-delay:${ri * .08}s">
-            <div class="card-img-wrap">
-              <img src="${getImg(rn.kategori, ri + 1)}" alt="${rn.judul}" loading="lazy" />
-              <div class="card-img-overlay"></div>
-              <div class="card-badge">${getCatBadge(rn.kategori)}</div>
-            </div>
-            <div class="card-body">
-              <h3 class="card-title">${rn.judul}</h3>
-            </div>
-            <div class="card-footer">
-              <span><i class="bi bi-clock"></i> ${rn.waktu}</span>
-              <span class="card-read-btn">Baca <i class="bi bi-arrow-right"></i></span>
-            </div>
-          </div>`).join('')}
-      </div>
-    </div>` : ''}
-  `;
+  var isiHtml = '';
+  for (var k = 0; k < article.isi.length; k++) {
+    isiHtml += '<p>' + article.isi[k] + '</p>';
+  }
 
-  // Related clicks
-  $$('.news-card', container).forEach(card => {
-    card.addEventListener('click', () => showDetail(+card.dataset.id));
-  });
+  var tagsHtml = '';
+  for (var t = 0; t < article.tags.length; t++) {
+    tagsHtml += '<span class="tag">#' + article.tags[t] + '</span>';
+  }
+
+  var relatedHtml = '';
+  if (related.length > 0) {
+    var cards = '';
+    for (var r = 0; r < related.length; r++) {
+      var rn = related[r];
+      cards +=
+        '<div class="col-md-4">' +
+          '<div class="news-card" data-id="' + rn.id + '">' +
+            '<div class="card-img">' +
+              '<img src="' + rn.gambar + '" alt="' + rn.judul + '" loading="lazy">' +
+              '<div class="card-badge">' + getBadge(rn.kategori) + '</div>' +
+            '</div>' +
+            '<div class="card-content">' +
+              '<h3 class="card-title">' + rn.judul + '</h3>' +
+            '</div>' +
+            '<div class="card-footer-row">' +
+              '<span>' + rn.waktu + '</span>' +
+              '<span class="read-link">Baca <i class="bi bi-arrow-right"></i></span>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    }
+    relatedHtml =
+      '<div class="related-title">Berita Terkait</div>' +
+      '<div class="row g-3">' + cards + '</div>';
+  }
+
+  document.getElementById('detailContainer').innerHTML =
+    '<div class="detail-img"><img src="' + article.gambar + '" alt="' + article.judul + '"></div>' +
+    '<div class="detail-badge">' + getBadge(article.kategori) + '</div>' +
+    '<h1 class="detail-title">' + article.judul + '</h1>' +
+    '<div class="detail-meta">' +
+      '<span><i class="bi bi-person-circle"></i>' + article.penulis + '</span>' +
+      '<span><i class="bi bi-clock-fill"></i>' + article.waktu + '</span>' +
+      '<span><i class="bi bi-eye-fill"></i>' + article.views + ' pembaca</span>' +
+    '</div>' +
+    '<div class="detail-body">' + isiHtml + '</div>' +
+    '<div class="detail-tags">' + tagsHtml + '</div>' +
+    relatedHtml;
+
+  // Pasang event pada related cards
+  var relCards = document.getElementById('detailContainer').querySelectorAll('.news-card');
+  for (var rc = 0; rc < relCards.length; rc++) {
+    (function(card) {
+      card.onclick = function() {
+        showDetail(parseInt(card.getAttribute('data-id')));
+      };
+    })(relCards[rc]);
+  }
 }
 
 function showHome() {
-  $('#detailView').style.display = 'none';
-  $('#homeView').style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('detailView').style.display = 'none';
+  document.getElementById('homeView').style.display = 'block';
+  window.scrollTo(0, 0);
 }
 
-/* ═════════════════════════════════════════════════
-   CATEGORY FILTER
-═════════════════════════════════════════════════ */
-function initCategories() {
-  $$('.cat-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      $$('.cat-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentCat = btn.dataset.cat;
-      currentSearch = '';
-      $('#searchInput').value = '';
-      $('#searchClear').style.display = 'none';
-      renderGrid();
-      showHome();
-    });
-  });
+// ====================================
+// Kategori
+// ====================================
+function initKategori() {
+  var btns = document.querySelectorAll('.cat-btn');
+  for (var i = 0; i < btns.length; i++) {
+    (function(btn) {
+      btn.onclick = function() {
+        for (var j = 0; j < btns.length; j++) btns[j].classList.remove('active');
+        btn.classList.add('active');
+        currentCat = btn.getAttribute('data-cat');
+        currentSearch = '';
+        document.getElementById('searchInput').value = '';
+        showHome();
+        renderGrid();
+      };
+    })(btns[i]);
+  }
 }
 
-/* ═════════════════════════════════════════════════
-   SEARCH
-═════════════════════════════════════════════════ */
+// ====================================
+// Search
+// ====================================
 function initSearch() {
-  const input = $('#searchInput');
-  const clearBtn = $('#searchClear');
-
-  let debounce;
-  input.addEventListener('input', () => {
-    clearTimeout(debounce);
-    debounce = setTimeout(() => {
-      currentSearch = input.value;
-      clearBtn.style.display = currentSearch ? 'flex' : 'none';
-      showHome();
-      renderGrid();
-    }, 220);
-  });
-
-  clearBtn.addEventListener('click', () => {
-    input.value = '';
-    currentSearch = '';
-    clearBtn.style.display = 'none';
+  var input = document.getElementById('searchInput');
+  input.oninput = function() {
+    currentSearch = input.value;
+    showHome();
     renderGrid();
-  });
-
-  // Mobile search toggle
-  const mobileBtn = $('#mobileSearchBtn');
-  const searchWrap = $('#searchWrapper');
-  mobileBtn.addEventListener('click', () => {
-    searchWrap.classList.toggle('mobile-show');
-    if (searchWrap.classList.contains('mobile-show')) input.focus();
-  });
+  };
 }
 
-/* ═════════════════════════════════════════════════
-   NAVBAR SCROLL SHADOW
-═════════════════════════════════════════════════ */
-function initNavScroll() {
-  const nav = $('#mainNav');
-  window.addEventListener('scroll', () => {
-    nav.style.boxShadow = window.scrollY > 10
-      ? '0 4px 20px rgba(0,0,0,.12)'
-      : 'none';
-  }, { passive: true });
-}
-
-/* ═════════════════════════════════════════════════
-   INIT
-═════════════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
+// ====================================
+// INIT
+// ====================================
+document.addEventListener('DOMContentLoaded', function() {
   initDarkMode();
-  buildTicker();
   buildHero();
   buildTrending();
   renderGrid();
-  initCategories();
+  initKategori();
   initSearch();
-  initNavScroll();
 
-  // Dark toggle
-  $('#darkToggle').addEventListener('click', toggleDark);
-
-  // Back button
-  $('#backBtn').addEventListener('click', showHome);
+  document.getElementById('darkToggle').onclick = toggleDark;
+  document.getElementById('backBtn').onclick = showHome;
 });
